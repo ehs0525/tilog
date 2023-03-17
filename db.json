@@ -1,0 +1,53 @@
+{
+  "posts": [
+    {
+      "title": "vuejs112233",
+      "content": "vuejs content112233",
+      "createdAt": 1679046865675,
+      "id": 1,
+      "isPrivate": true
+    },
+    {
+      "title": "redux",
+      "content": "redux22",
+      "isPrivate": true,
+      "createdAt": 1679057894477,
+      "id": 2
+    },
+    {
+      "title": "bol23",
+      "content": "gaji23",
+      "isPrivate": false,
+      "createdAt": 1679058448585,
+      "id": 3
+    },
+    {
+      "title": "admintest",
+      "content": "admintest!",
+      "isPrivate": false,
+      "createdAt": 1679060363056,
+      "id": 4
+    },
+    {
+      "title": "recoiljs",
+      "content": "recoiljs content",
+      "isPrivate": false,
+      "createdAt": 1679061338984,
+      "id": 5
+    },
+    {
+      "title": "test",
+      "content": "test",
+      "isPrivate": false,
+      "createdAt": 1679061383102,
+      "id": 6
+    },
+    {
+      "title": "1122",
+      "content": "112233",
+      "isPrivate": false,
+      "createdAt": 1679061499947,
+      "id": 7
+    }
+  ]
+}

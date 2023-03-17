@@ -13,10 +13,11 @@ const BlogList = ({ isAdmin }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [numberOfPosts, setNumberOfPosts] = useState(0);
   const [numberOfPages, setNumberOfPages] = useState(0);
+  const [searchWord, setSearchWord] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
 
-  const limit = 1;
+  const limit = 5;
   const pageParam = new URLSearchParams(location.search).get("page");
 
   const fetchPosts = useCallback(
@@ -26,6 +27,7 @@ const BlogList = ({ isAdmin }) => {
         _limit: limit,
         _sort: "id",
         _order: "desc",
+        title_like: searchWord,
       };
       if (!isAdmin) {
         params = { ...params, isPrivate: false };
@@ -41,7 +43,7 @@ const BlogList = ({ isAdmin }) => {
           setNumberOfPosts(res.headers["x-total-count"]);
         });
     },
-    [isAdmin]
+    [isAdmin, searchWord]
   );
 
   useEffect(() => {
@@ -50,8 +52,21 @@ const BlogList = ({ isAdmin }) => {
   useEffect(() => {
     setCurrentPage(parseInt(pageParam) || 1);
     fetchPosts(parseInt(pageParam) || 1);
-  }, [pageParam, fetchPosts]);
+  }, []);
 
+  const onChangeSearchWord = useCallback((e) => {
+    setSearchWord(e.target.value);
+  }, []);
+  const onSearch = useCallback(
+    (e) => {
+      if (e.key === "Enter") {
+        navigate(`${location.pathname}?page=1`);
+        setCurrentPage(1);
+        fetchPosts(1);
+      }
+    },
+    [navigate, location.pathname, fetchPosts]
+  );
   const onClickCard = useCallback(
     (id) => () => {
       navigate(`/blogs/${id}`);
@@ -70,43 +85,59 @@ const BlogList = ({ isAdmin }) => {
   const onClickPagination = useCallback(
     (page) => {
       navigate(`${location.pathname}?page=${page}`);
+      setCurrentPage(page);
       fetchPosts(page);
     },
-    [navigate]
+    [navigate, location.pathname, fetchPosts]
   );
+
+  const publicPosts = posts.filter((post) => isAdmin || !post.isPrivate);
 
   if (isLoading) {
     return <LoadingSpinner />;
   }
 
-  const publicPosts = posts.filter((post) => isAdmin || !post.isPrivate);
-
-  if (publicPosts.length === 0) {
-    return <div>No blog posts found</div>;
-  }
-
   return (
     <div>
-      {publicPosts.map((post) => (
-        <Card key={post.id} title={post.title} onClick={onClickCard(post.id)}>
-          {isAdmin && (
-            <div>
-              <button
-                className="btn btn-danger btn-sm"
-                onClick={onClickDelete(post.id)}
-              >
-                Delete
-              </button>
-            </div>
+      <input
+        className="form-control"
+        type="text"
+        placeholder="Search.."
+        value={searchWord}
+        onChange={onChangeSearchWord}
+        onKeyDown={onSearch}
+      />
+      <hr />
+      {publicPosts.length === 0 ? (
+        <div>No blog posts found</div>
+      ) : (
+        <>
+          {publicPosts.map((post) => (
+            <Card
+              key={post.id}
+              title={post.title}
+              onClick={onClickCard(post.id)}
+            >
+              {isAdmin && (
+                <div>
+                  <button
+                    className="btn btn-danger btn-sm"
+                    onClick={onClickDelete(post.id)}
+                  >
+                    Delete
+                  </button>
+                </div>
+              )}
+            </Card>
+          ))}
+          {numberOfPages > 1 && (
+            <Pagination
+              currentPage={currentPage}
+              numberOfPages={numberOfPages}
+              onClick={onClickPagination}
+            />
           )}
-        </Card>
-      ))}
-      {numberOfPages > 1 && (
-        <Pagination
-          currentPage={currentPage}
-          numberOfPages={numberOfPages}
-          onClick={onClickPagination}
-        />
+        </>
       )}
     </div>
   );

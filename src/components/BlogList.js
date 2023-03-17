@@ -19,13 +19,38 @@ const BlogList = ({ isAdmin }) => {
   const limit = 1;
   const pageParam = new URLSearchParams(location.search).get("page");
 
+  const fetchPosts = useCallback(
+    (page) => {
+      let params = {
+        _page: page,
+        _limit: limit,
+        _sort: "id",
+        _order: "desc",
+      };
+      if (!isAdmin) {
+        params = { ...params, isPrivate: false };
+      }
+
+      axios
+        .get(`http://localhost:3001/posts`, {
+          params,
+        })
+        .then((res) => {
+          setPosts(res.data);
+          setIsLoading(false);
+          setNumberOfPosts(res.headers["x-total-count"]);
+        });
+    },
+    [isAdmin]
+  );
+
   useEffect(() => {
     setNumberOfPages(Math.ceil(numberOfPosts / limit));
   }, [numberOfPosts]);
   useEffect(() => {
     setCurrentPage(parseInt(pageParam) || 1);
     fetchPosts(parseInt(pageParam) || 1);
-  }, [pageParam]);
+  }, [pageParam, fetchPosts]);
 
   const onClickCard = useCallback(
     (id) => () => {
@@ -49,28 +74,6 @@ const BlogList = ({ isAdmin }) => {
     },
     [navigate]
   );
-
-  const fetchPosts = (page) => {
-    let params = {
-      _page: page,
-      _limit: limit,
-      _sort: "id",
-      _order: "desc",
-    };
-    if (!isAdmin) {
-      params = { ...params, isPrivate: false };
-    }
-
-    axios
-      .get(`http://localhost:3001/posts`, {
-        params,
-      })
-      .then((res) => {
-        setPosts(res.data);
-        setIsLoading(false);
-        setNumberOfPosts(res.headers["x-total-count"]);
-      });
-  };
 
   if (isLoading) {
     return <LoadingSpinner />;

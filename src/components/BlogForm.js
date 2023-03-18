@@ -10,8 +10,25 @@ const BlogForm = ({ editing }) => {
   const [originalContent, setOriginalContent] = useState("");
   const [isPrivate, setIsPrivate] = useState(false);
   const [originalIsPrivate, setOriginalIsPrivate] = useState(false);
+  const [titleError, setTitleError] = useState(false);
+  const [contentError, setContentError] = useState(false);
   const navigate = useNavigate();
   const { id } = useParams();
+
+  const validateForm = useCallback(() => {
+    let isValid = true;
+
+    if (title.length === 0) {
+      setTitleError(true);
+      isValid = false;
+    }
+    if (content.length === 0) {
+      setContentError(true);
+      isValid = false;
+    }
+
+    return isValid;
+  }, [title.length, content.length]);
 
   useEffect(() => {
     if (editing) {
@@ -36,29 +53,33 @@ const BlogForm = ({ editing }) => {
     setIsPrivate(e.target.checked);
   }, []);
   const onSubmit = useCallback(() => {
-    if (editing) {
-      axios
-        .patch(`http://localhost:3001/posts/${id}`, {
-          title,
-          content,
-          isPrivate,
-        })
-        .then(() => {
-          navigate(`/blogs/${id}`);
-        });
-    } else {
-      axios
-        .post("http://localhost:3001/posts", {
-          title,
-          content,
-          isPrivate,
-          createdAt: Date.now(),
-        })
-        .then(() => {
-          navigate("/admin");
-        });
+    setTitleError(false);
+    setContentError(false);
+    if (validateForm()) {
+      if (editing) {
+        axios
+          .patch(`http://localhost:3001/posts/${id}`, {
+            title,
+            content,
+            isPrivate,
+          })
+          .then(() => {
+            navigate(`/blogs/${id}`);
+          });
+      } else {
+        axios
+          .post("http://localhost:3001/posts", {
+            title,
+            content,
+            isPrivate,
+            createdAt: Date.now(),
+          })
+          .then(() => {
+            navigate("/admin");
+          });
+      }
     }
-  }, [editing, id, title, content, isPrivate, navigate]);
+  }, [validateForm, editing, id, title, content, isPrivate, navigate]);
   const onClickCancel = useCallback(() => {
     if (editing) {
       navigate(`/blogs/${id}`);
@@ -78,19 +99,23 @@ const BlogForm = ({ editing }) => {
       <div className="mb-3">
         <label className="form-label">Title</label>
         <input
-          className="form-control"
+          className={`form-control ${titleError && "border-danger"}`}
           value={title}
           onChange={onChangeTitle}
         />
+        {titleError && <div className="text-danger">Title is required.</div>}
       </div>
       <div className="mb-3">
         <label className="form-label">Content</label>
         <textarea
-          className="form-control"
+          className={`form-control ${contentError && "border-danger"}`}
           rows={10}
           value={content}
           onChange={onChangeContent}
         />
+        {contentError && (
+          <div className="text-danger">Content is required.</div>
+        )}
       </div>
       <div className="form-check mb-3">
         <input

@@ -4,6 +4,7 @@ import WritePage from "./pages/WritePage";
 import EditPage from "./pages/EditPage";
 import DetailPage from "./pages/DetailPage";
 import AdminPage from "./pages/AdminPage";
+import NotFoundPage from "./pages/NotFoundPage";
 
 const routes = [
   {
@@ -32,6 +33,10 @@ const routes = [
     path: "/admin",
     component: <AdminPage />,
     auth: true,
+  },
+  {
+    path: "*",
+    component: <NotFoundPage />,
   },
 ];
 

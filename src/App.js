@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, redirect } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 import useToast from "./hooks/useToast";
@@ -9,6 +9,7 @@ import routes from "./routes";
 
 const App = () => {
   const toasts = useSelector((state) => state.toast.toasts);
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const { deleteToast } = useToast();
 
   return (

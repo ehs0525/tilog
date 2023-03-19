@@ -7,7 +7,6 @@ import { v4 as uuidv4 } from "uuid";
 import Card from "../components/Card";
 import LoadingSpinner from "../components/LoadingSpinner";
 import Pagination from "./Pagination";
-import Toast from "./Toast";
 import useToast from "../hooks/useToast";
 
 const BlogList = ({ isAdmin }) => {
@@ -20,7 +19,7 @@ const BlogList = ({ isAdmin }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [toasts, addToast, deleteToast] = useToast();
+  const { addToast, deleteToast } = useToast();
 
   const limit = 5;
   const pageParam = new URLSearchParams(location.search).get("page");
@@ -88,7 +87,7 @@ const BlogList = ({ isAdmin }) => {
         addToast(
           {
             type: "success",
-            text: "Successfully created!",
+            text: "Successfully deleted!",
           },
           toastId
         );
@@ -116,7 +115,6 @@ const BlogList = ({ isAdmin }) => {
 
   return (
     <div>
-      <Toast toasts={toasts} deleteToast={deleteToast} />
       <input
         className="form-control"
         type="text"

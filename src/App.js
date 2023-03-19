@@ -1,5 +1,6 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 import useToast from "./hooks/useToast";
 import NavBar from "./components/NavBar";
@@ -7,7 +8,8 @@ import Toast from "./components/Toast";
 import routes from "./routes";
 
 const App = () => {
-  const [toasts, addToast, deleteToast] = useToast();
+  const toasts = useSelector((state) => state.toast.toasts);
+  const { deleteToast } = useToast();
 
   return (
     <BrowserRouter>

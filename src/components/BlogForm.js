@@ -1,9 +1,11 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import PropTypes from "prop-types";
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
+
 import Toast from "./Toast";
+import useToast from "../hooks/useToast";
 
 const BlogForm = ({ editing }) => {
   const [title, setTitle] = useState("");
@@ -14,10 +16,10 @@ const BlogForm = ({ editing }) => {
   const [originalIsPrivate, setOriginalIsPrivate] = useState(false);
   const [titleError, setTitleError] = useState(false);
   const [contentError, setContentError] = useState(false);
-  const [, setToastUpdated] = useState(false);
-  const toasts = useRef([]);
   const navigate = useNavigate();
   const { id } = useParams();
+
+  const [toasts, addToast, deleteToast] = useToast();
 
   useEffect(() => {
     if (editing) {
@@ -46,21 +48,7 @@ const BlogForm = ({ editing }) => {
 
     return isValid;
   }, [title.length, content.length]);
-  const addToast = useCallback(
-    (toast) => () => {
-      toasts.current = [...toasts.current, toast];
-      setToastUpdated((prev) => !prev);
-    },
-    []
-  );
 
-  const onDeleteToast = useCallback(
-    (id) => () => {
-      toasts.current = toasts.current.filter((toast) => toast.id !== id);
-      setToastUpdated((prev) => !prev);
-    },
-    []
-  );
   const onChangeTitle = useCallback((e) => {
     setTitle(e.target.value);
   }, []);
@@ -94,12 +82,14 @@ const BlogForm = ({ editing }) => {
           })
           .then(() => {
             const id = uuidv4();
-            addToast({
-              type: "success",
-              text: "Successfully created!",
-              id,
-            })();
-            setTimeout(() => onDeleteToast(id)(), 5000);
+            addToast(
+              {
+                type: "success",
+                text: "Successfully created!",
+              },
+              id
+            );
+            setTimeout(() => deleteToast(id)(), 5000);
             // navigate("/admin");
           });
       }
@@ -120,7 +110,7 @@ const BlogForm = ({ editing }) => {
 
   return (
     <div>
-      <Toast toasts={toasts.current} deleteToast={onDeleteToast} />
+      <Toast toasts={toasts} deleteToast={deleteToast} />
       <h1>{editing ? "Edit" : "Create"} a blog post</h1>
       <div className="mb-3">
         <label className="form-label">Title</label>

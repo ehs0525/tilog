@@ -1,11 +1,13 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import axios from "axios";
+import { v4 as uuidv4 } from "uuid";
 
 import Card from "../components/Card";
 import LoadingSpinner from "../components/LoadingSpinner";
 import Pagination from "./Pagination";
+import Toast from "./Toast";
 
 const BlogList = ({ isAdmin }) => {
   const [posts, setPosts] = useState([]);
@@ -14,6 +16,8 @@ const BlogList = ({ isAdmin }) => {
   const [numberOfPosts, setNumberOfPosts] = useState(0);
   const [numberOfPages, setNumberOfPages] = useState(0);
   const [searchWord, setSearchWord] = useState("");
+  const [, setToastUpdated] = useState(false);
+  const toasts = useRef([]);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -54,6 +58,21 @@ const BlogList = ({ isAdmin }) => {
     fetchPosts(parseInt(pageParam) || 1);
   }, []);
 
+  const addToast = useCallback(
+    (toast) => () => {
+      toasts.current = [...toasts.current, toast];
+      setToastUpdated((prev) => !prev);
+    },
+    []
+  );
+
+  const onDeleteToast = useCallback(
+    (id) => () => {
+      toasts.current = toasts.current.filter((toast) => toast.id !== id);
+      setToastUpdated((prev) => !prev);
+    },
+    []
+  );
   const onChangeSearchWord = useCallback((e) => {
     setSearchWord(e.target.value);
   }, []);
@@ -73,11 +92,20 @@ const BlogList = ({ isAdmin }) => {
     },
     [navigate]
   );
-  const onClickDelete = useCallback(
+  const onClickDeletePost = useCallback(
     (id) => (e) => {
       e.stopPropagation();
       axios.delete(`http://localhost:3001/posts/${id}`).then(() => {
+        const toastId = uuidv4();
         setPosts((prevState) => prevState.filter((post) => post.id !== id));
+        addToast({
+          type: "success",
+          text: "Successfully created!",
+          id: toastId,
+        })();
+        setTimeout(() => {
+          onDeleteToast(toastId)();
+        }, 5000);
       });
     },
     []
@@ -99,6 +127,7 @@ const BlogList = ({ isAdmin }) => {
 
   return (
     <div>
+      <Toast toasts={toasts.current} deleteToast={onDeleteToast} />
       <input
         className="form-control"
         type="text"
@@ -122,7 +151,7 @@ const BlogList = ({ isAdmin }) => {
                 <div>
                   <button
                     className="btn btn-danger btn-sm"
-                    onClick={onClickDelete(post.id)}
+                    onClick={onClickDeletePost(post.id)}
                   >
                     Delete
                   </button>

@@ -17,13 +17,15 @@ const App = () => {
       <Toast toasts={toasts} deleteToast={deleteToast} />
       <div className="container mt-3">
         <Routes>
-          {routes.map((route) => (
-            <Route
-              key={route.path}
-              path={route.path}
-              element={route.component}
-            />
-          ))}
+          {routes.map((route) => {
+            return (
+              <Route
+                key={route.path}
+                path={route.path}
+                element={route.component}
+              />
+            );
+          })}
         </Routes>
       </div>
     </BrowserRouter>

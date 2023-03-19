@@ -17,6 +17,7 @@ const routes = [
   {
     path: "/blogs/write",
     component: <WritePage />,
+    auth: true,
   },
   {
     path: "/blogs/:id",
@@ -25,10 +26,12 @@ const routes = [
   {
     path: "/blogs/:id/edit",
     component: <EditPage />,
+    auth: true,
   },
   {
     path: "/admin",
     component: <AdminPage />,
+    auth: true,
   },
 ];
 

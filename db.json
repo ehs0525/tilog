@@ -34,6 +34,20 @@
       "isPrivate": false,
       "createdAt": 1679223441441,
       "id": 8
+    },
+    {
+      "title": "아이 신나",
+      "content": "히히",
+      "isPrivate": false,
+      "createdAt": 1679299097064,
+      "id": 9
+    },
+    {
+      "title": "아이 신나용",
+      "content": "히히히",
+      "isPrivate": false,
+      "createdAt": 1679299132112,
+      "id": 10
     }
   ]
 }

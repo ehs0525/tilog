@@ -126,7 +126,7 @@ const BlogForm = ({ editing }) => {
               id
             );
             setTimeout(() => deleteToast(id)(), 5000);
-            // navigate("/admin");
+            navigate("/admin");
           })
           .catch((err) => {
             setError("Cannot create new blog");

@@ -6,6 +6,7 @@ import useToast from "./hooks/useToast";
 import NavBar from "./components/NavBar";
 import Toast from "./components/Toast";
 import LoadingSpinner from "./components/LoadingSpinner";
+import ProtectedRoute from "./ProtectedRoute";
 import routes from "./routes";
 import { login } from "./store/authSlice";
 
@@ -21,7 +22,7 @@ const App = () => {
       dispatch(login());
     }
     setIsLoading(false);
-  }, []);
+  }, [dispatch]);
 
   if (isLoading) {
     return <LoadingSpinner />;
@@ -32,15 +33,19 @@ const App = () => {
       <Toast toasts={toasts} deleteToast={deleteToast} />
       <div className="container mt-3">
         <Routes>
-          {routes.map((route) => {
-            return (
-              <Route
-                key={route.path}
-                path={route.path}
-                element={route.component}
-              />
-            );
-          })}
+          {routes.map((route) => (
+            <Route
+              key={route.path}
+              path={route.path}
+              element={
+                route.auth ? (
+                  <ProtectedRoute element={route.element} />
+                ) : (
+                  route.element
+                )
+              }
+            />
+          ))}
         </Routes>
       </div>
     </BrowserRouter>

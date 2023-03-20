@@ -1,17 +1,31 @@
-import React from "react";
-import { BrowserRouter, Routes, Route, redirect } from "react-router-dom";
-import { useSelector } from "react-redux";
+import React, { useEffect, useState } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 
 import useToast from "./hooks/useToast";
 import NavBar from "./components/NavBar";
 import Toast from "./components/Toast";
+import LoadingSpinner from "./components/LoadingSpinner";
 import routes from "./routes";
+import { login } from "./store/authSlice";
 
 const App = () => {
   const toasts = useSelector((state) => state.toast.toasts);
-  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const [isLoading, setIsLoading] = useState(true);
+  const dispatch = useDispatch();
+
   const { deleteToast } = useToast();
 
+  useEffect(() => {
+    if (localStorage.getItem("isLoggedIn")) {
+      dispatch(login());
+    }
+    setIsLoading(false);
+  }, []);
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
   return (
     <BrowserRouter>
       <NavBar />

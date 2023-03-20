@@ -16,6 +16,7 @@ const BlogList = ({ isAdmin }) => {
   const [numberOfPosts, setNumberOfPosts] = useState(0);
   const [numberOfPages, setNumberOfPages] = useState(0);
   const [searchWord, setSearchWord] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -45,6 +46,22 @@ const BlogList = ({ isAdmin }) => {
           setPosts(res.data);
           setIsLoading(false);
           setNumberOfPosts(res.headers["x-total-count"]);
+        })
+        .catch((err) => {
+          setIsLoading(false);
+          setError("Something went wrong in database");
+
+          const toastId = uuidv4();
+          addToast(
+            {
+              type: "danger",
+              text: "Something went wrong",
+            },
+            toastId
+          );
+          setTimeout(() => {
+            deleteToast(toastId)();
+          }, 5000);
         });
     },
     [isAdmin, searchWord]
@@ -109,10 +126,12 @@ const BlogList = ({ isAdmin }) => {
 
   const publicPosts = posts.filter((post) => isAdmin || !post.isPrivate);
 
+  if (error) {
+    return <div>{error}</div>;
+  }
   if (isLoading) {
     return <LoadingSpinner />;
   }
-
   return (
     <div>
       <input

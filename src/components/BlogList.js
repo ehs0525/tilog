@@ -100,7 +100,8 @@ const BlogList = ({ isAdmin }) => {
       axios
         .delete(`http://localhost:3001/posts/${id}`)
         .then(() => {
-          setPosts((prevState) => prevState.filter((post) => post.id !== id));
+          // setPosts((prevState) => prevState.filter((post) => post.id !== id));
+          fetchPosts(1);
 
           const toastId = uuidv4();
           addToast(

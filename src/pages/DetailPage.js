@@ -1,16 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import axios from "axios";
+import { v4 as uuidv4 } from "uuid";
 
 import LoadingSpinner from "../components/LoadingSpinner";
 import { useSelector } from "react-redux";
+import useToast from "../hooks/useToast";
 
 const DetailPage = () => {
   const { id } = useParams();
   const [post, setPost] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [timer, setTimer] = useState(0);
+  const [error, setError] = useState("");
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+
+  const { addToast, deleteToast } = useToast();
 
   useEffect(() => {
     fetchPost(id);
@@ -26,10 +31,27 @@ const DetailPage = () => {
   }, []);
 
   const fetchPost = (id) => {
-    axios.get(`http://localhost:3001/posts/${id}`).then((res) => {
-      setPost(res.data);
-      setIsLoading(false);
-    });
+    axios
+      .get(`http://localhost:3001/posts/${id}`)
+      .then((res) => {
+        setPost(res.data);
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        setError("Something went wrong in database");
+        const toastId = uuidv4();
+        addToast(
+          {
+            type: "danger",
+            text: "Something went wrong in database",
+          },
+          toastId
+        );
+        setTimeout(() => {
+          deleteToast(toastId)();
+        }, 5000);
+        setIsLoading(false);
+      });
   };
 
   const printDate = (timestamp) => {
@@ -39,7 +61,9 @@ const DetailPage = () => {
   if (isLoading) {
     return <LoadingSpinner />;
   }
-
+  if (error) {
+    return <div>{error}</div>;
+  }
   return (
     <div>
       <div className="d-flex">

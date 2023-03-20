@@ -4,8 +4,8 @@ import PropTypes from "prop-types";
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
 
-import Toast from "./Toast";
 import useToast from "../hooks/useToast";
+import LoadingSpinner from "./LoadingSpinner";
 
 const BlogForm = ({ editing }) => {
   const [title, setTitle] = useState("");
@@ -16,21 +16,43 @@ const BlogForm = ({ editing }) => {
   const [originalIsPrivate, setOriginalIsPrivate] = useState(false);
   const [titleError, setTitleError] = useState(false);
   const [contentError, setContentError] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
   const { id } = useParams();
 
-  const [addToast, deleteToast] = useToast();
+  const { addToast, deleteToast } = useToast();
 
   useEffect(() => {
     if (editing) {
-      axios.get(`http://localhost:3001/posts/${id}`).then((res) => {
-        setTitle(res.data.title);
-        setOriginalTitle(res.data.title);
-        setContent(res.data.content);
-        setOriginalContent(res.data.content);
-        setIsPrivate(res.data.isPrivate);
-        setOriginalIsPrivate(res.data.isPrivate);
-      });
+      axios
+        .get(`http://localhost:3001/posts/${id}`)
+        .then((res) => {
+          setTitle(res.data.title);
+          setOriginalTitle(res.data.title);
+          setContent(res.data.content);
+          setOriginalContent(res.data.content);
+          setIsPrivate(res.data.isPrivate);
+          setOriginalIsPrivate(res.data.isPrivate);
+          setIsLoading(false);
+        })
+        .catch((err) => {
+          setError("Something went wrong in database");
+          const toastId = uuidv4();
+          addToast(
+            {
+              type: "danger",
+              text: "Something went wrong in database",
+            },
+            toastId
+          );
+          setTimeout(() => {
+            deleteToast(toastId)();
+          }, 5000);
+          setIsLoading(false);
+        });
+    } else {
+      setIsLoading(false);
     }
   }, [editing, id]);
 
@@ -71,6 +93,20 @@ const BlogForm = ({ editing }) => {
           })
           .then(() => {
             navigate(`/blogs/${id}`);
+          })
+          .catch((err) => {
+            setError("Cannot update blog");
+            const toastId = uuidv4();
+            addToast(
+              {
+                type: "danger",
+                text: "Cannot update blog",
+              },
+              toastId
+            );
+            setTimeout(() => {
+              deleteToast(toastId)();
+            }, 5000);
           });
       } else {
         axios
@@ -91,6 +127,20 @@ const BlogForm = ({ editing }) => {
             );
             setTimeout(() => deleteToast(id)(), 5000);
             // navigate("/admin");
+          })
+          .catch((err) => {
+            setError("Cannot create new blog");
+            const toastId = uuidv4();
+            addToast(
+              {
+                type: "danger",
+                text: "Cannot create new blog",
+              },
+              toastId
+            );
+            setTimeout(() => {
+              deleteToast(toastId)();
+            }, 5000);
           });
       }
     }
@@ -108,6 +158,12 @@ const BlogForm = ({ editing }) => {
     content !== originalContent ||
     isPrivate !== originalIsPrivate;
 
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+  if (error) {
+    return <div>{error}</div>;
+  }
   return (
     <div>
       <h1>{editing ? "Edit" : "Create"} a blog post</h1>

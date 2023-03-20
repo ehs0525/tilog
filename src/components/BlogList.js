@@ -97,21 +97,36 @@ const BlogList = ({ isAdmin }) => {
   const onClickDeletePost = useCallback(
     (id) => (e) => {
       e.stopPropagation();
-      axios.delete(`http://localhost:3001/posts/${id}`).then(() => {
-        setPosts((prevState) => prevState.filter((post) => post.id !== id));
+      axios
+        .delete(`http://localhost:3001/posts/${id}`)
+        .then(() => {
+          setPosts((prevState) => prevState.filter((post) => post.id !== id));
 
-        const toastId = uuidv4();
-        addToast(
-          {
-            type: "success",
-            text: "Successfully deleted!",
-          },
-          toastId
-        );
-        setTimeout(() => {
-          deleteToast(toastId)();
-        }, 5000);
-      });
+          const toastId = uuidv4();
+          addToast(
+            {
+              type: "success",
+              text: "Successfully deleted!",
+            },
+            toastId
+          );
+          setTimeout(() => {
+            deleteToast(toastId)();
+          }, 5000);
+        })
+        .catch((err) => {
+          const toastId = uuidv4();
+          addToast(
+            {
+              type: "danger",
+              text: "The blog could not be deleted.",
+            },
+            toastId
+          );
+          setTimeout(() => {
+            deleteToast(toastId)();
+          }, 5000);
+        });
     },
     [addToast, deleteToast]
   );

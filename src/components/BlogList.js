@@ -8,6 +8,7 @@ import Card from "../components/Card";
 import LoadingSpinner from "../components/LoadingSpinner";
 import Pagination from "./Pagination";
 import useToast from "../hooks/useToast";
+import { backUrl } from "../config/config";
 
 const BlogList = ({ isAdmin }) => {
   const [posts, setPosts] = useState([]);
@@ -39,7 +40,7 @@ const BlogList = ({ isAdmin }) => {
       }
 
       axios
-        .get(`http://localhost:3001/posts`, {
+        .get(`${backUrl}/posts`, {
           params,
         })
         .then((res) => {
@@ -98,7 +99,7 @@ const BlogList = ({ isAdmin }) => {
     (id) => (e) => {
       e.stopPropagation();
       axios
-        .delete(`http://localhost:3001/posts/${id}`)
+        .delete(`${backUrl}/posts/${id}`)
         .then(() => {
           // setPosts((prevState) => prevState.filter((post) => post.id !== id));
           fetchPosts(1);

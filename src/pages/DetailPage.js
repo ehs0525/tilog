@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { useSelector } from "react-redux";
 import useToast from "../hooks/useToast";
+import { backUrl } from "../config/config";
 
 const DetailPage = () => {
   const { id } = useParams();
@@ -32,7 +33,7 @@ const DetailPage = () => {
 
   const fetchPost = (id) => {
     axios
-      .get(`http://localhost:3001/posts/${id}`)
+      .get(`${backUrl}/posts/${id}`)
       .then((res) => {
         setPost(res.data);
         setIsLoading(false);

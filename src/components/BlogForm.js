@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import useToast from "../hooks/useToast";
 import LoadingSpinner from "./LoadingSpinner";
+import { backUrl } from "../config/config";
 
 const BlogForm = ({ editing }) => {
   const [title, setTitle] = useState("");
@@ -26,7 +27,7 @@ const BlogForm = ({ editing }) => {
   useEffect(() => {
     if (editing) {
       axios
-        .get(`http://localhost:3001/posts/${id}`)
+        .get(`${backUrl}/posts/${id}`)
         .then((res) => {
           setTitle(res.data.title);
           setOriginalTitle(res.data.title);
@@ -86,7 +87,7 @@ const BlogForm = ({ editing }) => {
     if (validateForm()) {
       if (editing) {
         axios
-          .patch(`http://localhost:3001/posts/${id}`, {
+          .patch(`${backUrl}/posts/${id}`, {
             title,
             content,
             isPrivate,
@@ -110,7 +111,7 @@ const BlogForm = ({ editing }) => {
           });
       } else {
         axios
-          .post("http://localhost:3001/posts", {
+          .post(`${backUrl}/posts`, {
             title,
             content,
             isPrivate,
